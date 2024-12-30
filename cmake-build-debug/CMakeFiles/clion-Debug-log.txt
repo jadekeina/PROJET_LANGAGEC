@@ -1,0 +1,27 @@
+"C:\Program Files\JetBrains\CLion 2024.2.2\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2024.2.2/bin/ninja/win/x64/ninja.exe" -DCMAKE_TOOLCHAIN_FILE=C:\Users\jadek\.vcpkg-clion\vcpkg\scripts\buildsystems\vcpkg.cmake -G Ninja -S "C:\Users\jadek\Documents\2ESGIA4\Langage C\PROJET-CSDL" -B "C:\Users\jadek\Documents\2ESGIA4\Langage C\PROJET-CSDL\cmake-build-debug"
+-- The C compiler identification is GNU 13.1.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/Program Files/JetBrains/CLion 2024.2.2/bin/mingw/bin/gcc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+CMake Error at C:/Users/jadek/.vcpkg-clion/vcpkg/scripts/buildsystems/vcpkg.cmake:859 (_find_package):
+  By not providing "FindSDL2_ttf.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "SDL2_ttf",
+  but CMake did not find one.
+
+  Could not find a package configuration file provided by "SDL2_ttf" with any
+  of the following names:
+
+    SDL2_ttfConfig.cmake
+    sdl2_ttf-config.cmake
+
+  Add the installation prefix of "SDL2_ttf" to CMAKE_PREFIX_PATH or set
+  "SDL2_ttf_DIR" to a directory containing one of the above files.  If
+  "SDL2_ttf" provides a separate development package or SDK, be sure it has
+  been installed.
+Call Stack (most recent call first):
+  CMakeLists.txt:15 (find_package)
+
+
+-- Configuring incomplete, errors occurred!
