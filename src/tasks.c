@@ -4,15 +4,14 @@
 #include <stdbool.h>
 #include "../cmake_modules/SDL2/SDL.h"
 #include <SDL2/SDL_ttf.h>
- // Inclusion de SDL_ttf pour le texte
 
-// Tableau de tâches et compteur
+// Ici on a le tablea de task et du compteur
 Task tasks[MAX_TASKS];
 int task_count = 0;
 
 void create_task(Task* task, const char* title, const char* description) {
     if (task != NULL) {
-        static int task_id = 0; // Identifiant unique auto-incrémenté
+        static int task_id = 0;
         task->id = task_id++;
         strncpy(task->title, title, sizeof(task->title) - 1);
         strncpy(task->description, description, sizeof(task->description) - 1);
@@ -54,19 +53,19 @@ void display_task(const Task* task) {
     }
 }
 
-// Prototypes des fonctions
+
 void renderTasks(SDL_Renderer *renderer, TTF_Font *font);
 void addTask(const char *title, const char *description, TaskStatus status);
 
 void run_task_manager() {
-    // Initialisation SDL
+
     SDL_Init(SDL_INIT_VIDEO);
-    TTF_Init();  // Initialisation de SDL_ttf
+    TTF_Init();
 
     SDL_Window *window = SDL_CreateWindow("Gestion des Tâches", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Chargement de la police (assure-toi que le fichier "font.ttf" est bien dans ton projet)
+
     TTF_Font *font = TTF_OpenFont("path_to_font/arial.ttf", 24); // Remplace par ton chemin de fichier .ttf
     if (!font) {
         printf("Erreur lors du chargement de la police : %s\n", TTF_GetError());
@@ -82,34 +81,34 @@ void run_task_manager() {
     SDL_Event event;
 
     while (running) {
-        // Gestion des événements
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = false;
             }
         }
 
-        // Nettoyage et rendu des tâches
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Fond blanc
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
-        renderTasks(renderer, font); // Affichage des tâches
+        renderTasks(renderer, font);
         SDL_RenderPresent(renderer);
     }
 
-    // Nettoyage
-    TTF_CloseFont(font);  // Fermer la police
+
+    TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
-    TTF_Quit();  // Fermer SDL_ttf
+    TTF_Quit();
 }
 
-// Fonction pour afficher les tâches avec des rectangles colorés
+// Ici c'est la fonction pour afficher des rectangles colorés
 void renderTasks(SDL_Renderer *renderer, TTF_Font *font) {
     int x = 50, y = 50, width = 200, height = 50;
 
     for (int i = 0; i < task_count; i++) {
-        // Définir la couleur en fonction du statut
+        // Donc la normalement on est censée avoir une souleur différentes selon le statut
         if (tasks[i].status == TODO) {
             SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255); // Orange
         } else if (tasks[i].status == IN_PROGRESS) {
@@ -118,30 +117,30 @@ void renderTasks(SDL_Renderer *renderer, TTF_Font *font) {
             SDL_SetRenderDrawColor(renderer, 34, 139, 34, 255); // Vert
         }
 
-        // Dessiner un rectangle pour chaque tâche
+        // Ici on dessine le rectangle
         SDL_Rect taskRect = {x, y + i * (height + 10), width, height};
         SDL_RenderFillRect(renderer, &taskRect);
 
-        // Ajouter une bordure
+        // on ajoute les petites bordures
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Noir
         SDL_RenderDrawRect(renderer, &taskRect);
 
-        // Créer une texture pour le texte de la tâche
+        // Texture poyr le texte
         SDL_Color textColor = {0, 0, 0}; // Texte en noir
         SDL_Surface *textSurface = TTF_RenderText_Solid(font, tasks[i].title, textColor);
         SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
 
-        // Afficher le texte dans la fenêtre
+        //Pour afficher  le texte dans la fenêtre
         SDL_Rect textRect = {x + 10, y + i * (height + 10) + 10, textSurface->w, textSurface->h};
         SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 
-        // Libération de la surface et texture
+        //
         SDL_FreeSurface(textSurface);
         SDL_DestroyTexture(textTexture);
     }
 }
 
-// Ajouter une tâche
+// Ajout d'une tâche
 void addTask(const char *title, const char *description, TaskStatus status) {
     if (task_count < MAX_TASKS) {
         tasks[task_count].id = task_count + 1;

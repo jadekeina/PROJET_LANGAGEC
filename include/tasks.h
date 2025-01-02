@@ -8,17 +8,17 @@
 #define MAX_TASKS 100
 
 typedef enum {
-    TODO,        // Tâche à faire
-    IN_PROGRESS, // Tâche en cours
-    DONE         // Tâche terminée
+    TODO,
+    IN_PROGRESS,
+    DONE
 } TaskStatus;
 
 typedef struct {
-    int id;               // Identifiant unique de la tâche
-    char title[100];      // Titre de la tâche
-    char description[200]; // Description de la tâche
-    TaskStatus status;    // Statut de la tâche
-    char assignee[50];    // Utilisateur auquel la tâche est attribuée
+    int id;
+    char title[100];
+    char description[200];
+    TaskStatus status;
+    char assignee[50];
 } Task;
 
 void create_task(Task* task, const char* title, const char* description);

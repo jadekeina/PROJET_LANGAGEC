@@ -12,7 +12,7 @@ void run_task_manager();
 int main(int argc, char *argv[]) {
     printf("Bienvenue dans l'application principale !\n");
 
-    // Appel du gestionnaire de tâches
+    // Ici on va faire l'Appel du gestionnaire de tâches
     run_task_manager();
 
     return 0;
