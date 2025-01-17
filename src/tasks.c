@@ -1,13 +1,21 @@
+#define SDL_MAIN_HANDLED
 #include "../include/tasks.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
-#include "../cmake_modules/SDL2/SDL.h"
-#include <SDL2/SDL_ttf.h>
+#include "SDL2/SDL_ttf.h"
+#include "SDL2/SDL.h"
+#define MAX_INPUT_LENGTH 256
 
-// Ici on a le tablea de task et du compteur
+char task_title_input[MAX_INPUT_LENGTH] = "";  // Correction du point-virgule manquant
+char task_description_input[MAX_INPUT_LENGTH] = "";  // Correction du point-virgule manquant
+
+// Ici on a le tableau de task et du compteur
 Task tasks[MAX_TASKS];
 int task_count = 0;
+
+bool is_title_input_active = false;  // Pour savoir si le champ du titre est actif
+bool is_description_input_active = false;  // Pour savoir si le champ de description est actif
 
 void create_task(Task* task, const char* title, const char* description) {
     if (task != NULL) {
@@ -53,62 +61,23 @@ void display_task(const Task* task) {
     }
 }
 
+void handle_text_input(SDL_Event *event) {
+    if (event->type == SDL_TEXTINPUT) {
+        // Saisie pour le titre ou la description
+        if (is_title_input_active) {
+            strncat(task_title_input, event->text.text, sizeof(task_title_input) - strlen(task_title_input) - 1);
+        } else if (is_description_input_active) {
+            strncat(task_description_input, event->text.text, sizeof(task_description_input) - strlen(task_description_input) - 1);
 
-void renderTasks(SDL_Renderer *renderer, TTF_Font *font);
-void addTask(const char *title, const char *description, TaskStatus status);
-
-void run_task_manager() {
-
-    SDL_Init(SDL_INIT_VIDEO);
-    TTF_Init();
-
-    SDL_Window *window = SDL_CreateWindow("Gestion des Tâches", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-
-    TTF_Font *font = TTF_OpenFont("path_to_font/arial.ttf", 24); // Remplace par ton chemin de fichier .ttf
-    if (!font) {
-        printf("Erreur lors du chargement de la police : %s\n", TTF_GetError());
-        return;
-    }
-
-    // Ajout de quelques tâches test
-    addTask("Tâche 1", "Description 1", TODO);
-    addTask("Tâche 2", "Description 2", IN_PROGRESS);
-    addTask("Tâche 3", "Description 3", DONE);
-
-    bool running = true;
-    SDL_Event event;
-
-    while (running) {
-
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                running = false;
-            }
         }
-
-
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
-        renderTasks(renderer, font);
-        SDL_RenderPresent(renderer);
     }
-
-
-    TTF_CloseFont(font);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    TTF_Quit();
 }
 
-// Ici c'est la fonction pour afficher des rectangles colorés
 void renderTasks(SDL_Renderer *renderer, TTF_Font *font) {
     int x = 50, y = 50, width = 200, height = 50;
 
     for (int i = 0; i < task_count; i++) {
-        // Donc la normalement on est censée avoir une souleur différentes selon le statut
+        // Choisir la couleur en fonction du statut
         if (tasks[i].status == TODO) {
             SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255); // Orange
         } else if (tasks[i].status == IN_PROGRESS) {
@@ -117,30 +86,23 @@ void renderTasks(SDL_Renderer *renderer, TTF_Font *font) {
             SDL_SetRenderDrawColor(renderer, 34, 139, 34, 255); // Vert
         }
 
-        // Ici on dessine le rectangle
         SDL_Rect taskRect = {x, y + i * (height + 10), width, height};
         SDL_RenderFillRect(renderer, &taskRect);
-
-        // on ajoute les petites bordures
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Noir
         SDL_RenderDrawRect(renderer, &taskRect);
 
-        // Texture poyr le texte
         SDL_Color textColor = {0, 0, 0}; // Texte en noir
         SDL_Surface *textSurface = TTF_RenderText_Solid(font, tasks[i].title, textColor);
         SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
 
-        //Pour afficher  le texte dans la fenêtre
         SDL_Rect textRect = {x + 10, y + i * (height + 10) + 10, textSurface->w, textSurface->h};
         SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 
-        //
         SDL_FreeSurface(textSurface);
         SDL_DestroyTexture(textTexture);
     }
 }
 
-// Ajout d'une tâche
 void addTask(const char *title, const char *description, TaskStatus status) {
     if (task_count < MAX_TASKS) {
         tasks[task_count].id = task_count + 1;
@@ -156,4 +118,43 @@ void addTask(const char *title, const char *description, TaskStatus status) {
     } else {
         printf("Nombre maximum de tâches atteint.\n");
     }
+}
+
+void run_task_manager() {
+    SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
+
+    SDL_Window *window = SDL_CreateWindow("Gestion des Tâches", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+    TTF_Font *font = TTF_OpenFont("path_to_font/arial.ttf", 24);
+    if (!font) {
+        printf("Erreur lors du chargement de la police : %s\n", TTF_GetError());
+        return;
+    }
+
+    bool running = true;
+    SDL_Event event;
+
+    while (running) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+            } else if (event.type == SDL_TEXTINPUT) {
+                handle_text_input(&event);  // Gérer l'entrée du texte
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
+
+        renderTasks(renderer, font);  // Affichage des tâches
+        SDL_RenderPresent(renderer);
+    }
+
+    TTF_CloseFont(font);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    TTF_Quit();
 }
